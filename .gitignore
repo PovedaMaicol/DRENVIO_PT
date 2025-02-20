@@ -1,0 +1,33 @@
+# Archivos de entorno (nunca subas credenciales)
+.env
+.env.local
+.env.*.local
+
+# Dependencias
+node_modules/
+.pnpm/
+
+# Archivos de lock (ya que usas pnpm, ignora el de npm)
+package-lock.json
+yarn.lock
+
+# Archivos de compilación y caché
+dist/
+build/
+*.tsbuildinfo
+
+# Caché de TypeScript
+*.tsbuildinfo
+.vscode/
+.idea/
+*.log
+.DS_Store
+
+# Configuración de pnpm
+.pnpm-store/
+.pnpm-debug.log
+
+# Archivos generados por el editor
+*.swp
+*.swo
+Thumbs.db
