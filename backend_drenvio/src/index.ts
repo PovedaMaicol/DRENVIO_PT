@@ -1,17 +1,22 @@
 import express from 'express';
-
+import cors from 'cors';
+import connectDB from './utils/db';
+import specialPricesRouter from './routes/specialPrices';
+import productsRouter from './routes/products';
 
 const app = express();
+
+app.use(cors());
 app.use(express.json());
 
-const PORT = 3000;
+connectDB();
 
-app.get('/ping', (req, res) => {
-    console.log("i'm here")
-    res.send('hello world');
- 
-});
+// Rutas
+app.use('/api/special-prices', specialPricesRouter);
+app.use('/api/products', productsRouter);
 
+
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });

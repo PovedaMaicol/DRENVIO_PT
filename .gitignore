@@ -1,7 +1,7 @@
 # Archivos de entorno (nunca subas credenciales)
 .env
-.env.local
-.env.*.local
+**/.env
+**/.env.*
 
 # Dependencias
 node_modules/
