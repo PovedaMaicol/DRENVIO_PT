@@ -13,8 +13,8 @@ export const getPreciosPorUsuario = async (userId: string) => {
 
 // Agregar un nuevo precio especial
 export const addPrecioEspecial = async (precioEspecial: SpecialPriceEntry) => {
-  const nuevoPrecio = new SpecialPrice(precioEspecial);
-  return await nuevoPrecio.save();
+  const specialPrice = new SpecialPrice(precioEspecial);
+  return await specialPrice.save();
 };
 
 // Actualizar un precio especial

@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 import { Request, Response } from "express"; 
 
-export const getProducts = async (_req: Request, res: Response): Promise<void> => {
+export const getUsers = async (_req: Request, res: Response): Promise<void> => {
     try {
-        const products = await mongoose.connection.collection("productos").find({}).toArray(); 
-        res.json(products);
+        const usuarios = await mongoose.connection.collection("usuarios").find({}).toArray(); 
+        res.json(usuarios);
     } catch (error) {
         console.error("Error obteniendo productos:", error);
         res.status(500).json({ message: "Server Error", error });

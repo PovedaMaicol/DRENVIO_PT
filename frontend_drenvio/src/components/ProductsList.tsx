@@ -1,24 +1,21 @@
-import { useEffect } from "react";
-import useFetch from "../hooks/useFetch";
-import { Product } from "../types/product";
+import React from "react";
+import { Product, Result } from "../types/product";
 
-const ProductsList = () => {
-  const [ products, setProducts] = useFetch();
+// Definir las props correctamente
+interface ProductsListProps {
+  products: Result<Product>; 
+}
 
-  useEffect(() => {
-    const url = import.meta.env.VITE_API_URL;
-    setProducts(url);
-    console.log(setProducts)
-  }, []);
+const ProductsList: React.FC<ProductsListProps> = ({ products }) => {
+  console.log("products", products);
 
-console.log('products', products)
   return (
     <div>
       <h1>Productos</h1>
       <ul>
-        {products.map((product: Product) => (
-          <li key={product?.id}>
-            {product.name} - ${product.price}
+        {products.map((product: Product) => ( 
+          <li key={product._id}>
+            {product.name} - ${product.price} - {product.category}
           </li>
         ))}
       </ul>

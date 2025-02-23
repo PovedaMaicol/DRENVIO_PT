@@ -1,7 +1,14 @@
 export interface Product {
-    id: string;
+    _id: string;
+    brand: string;
+    category: string;
+    description: string;
     name: string;
     price: number;
-    description?: string;
+    sku: string;
+    stock: number;
+    tags: string[];
+    updatedAt: string;
   }
-  
+
+  export type Result<T> = T[];
