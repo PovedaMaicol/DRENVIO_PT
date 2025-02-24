@@ -3,7 +3,7 @@ import { Result, Product } from "../types/product";
 import { User } from "../types/user";
 
 interface UploadProps {
-  users: Result<User>,
+  usersFilter: Result<User>,
   usersError: string | null
   usersLoading: boolean,
   products: Result<Product>,
@@ -11,7 +11,7 @@ interface UploadProps {
   productsLoading: boolean, 
 }
 
-const Upload: React.FC<UploadProps>= ({ users, usersLoading, usersError, products, productsLoading, productsError }) => {
+const Upload: React.FC<UploadProps>= ({ usersFilter, usersLoading, usersError, products, productsLoading, productsError }) => {
   const [price, setPrice] = useState(0);
   const [selectedUser, setSelectedUser] = useState("");
   const [selectedProduct, setSelectedProduct] = useState("");
@@ -25,7 +25,7 @@ const Upload: React.FC<UploadProps>= ({ users, usersLoading, usersError, product
   }
 
   // 🔹 Filtramos usuarios antes del return principal
-  const usersFilter = users ? users.filter((user) => user.role) : [];
+
 
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
