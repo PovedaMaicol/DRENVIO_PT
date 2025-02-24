@@ -46,9 +46,8 @@ router.post('/', async (req, res) => {
   
       // Validar que los campos obligatorios estén presentes
       if (!userId || !productId || !specialPrice) {
-        return res.status(400).json({ message: "userId, productId y specialPrice son obligatorios." });
+        res.status(400).json({ message: "userId, productId y specialPrice son obligatorios." });
       }
-      
   
       const addedSpecialPrice = await addPrecioEspecial(req.body);
       res.status(201).json({
@@ -94,7 +93,7 @@ router.put('/', async (req, res) => {
         const updatedSpecialPrice = await updatePrecioEspecial(userId, precioEspecialId, newPrice);
         
         if (updatedSpecialPrice) {
-
+            console.log(updatedSpecialPrice)
             res.status(200).json({
                 message: "Precio especial actualizado correctamente.",
                 specialPrice: updatedSpecialPrice

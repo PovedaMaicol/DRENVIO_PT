@@ -113,13 +113,21 @@ export const addPrecioEspecial = async (precioEspecial: SpecialPriceEntry) => {
 
 export const deletePrecioEspecial = async (userId: string, precioEspecialId: string) => {
   try {
+console.log('el backend recibe el precioId', precioEspecialId)
+console.log('el backend recibe el usuario,', userId)
 
-    const specialPrice = await SpecialPrice.findByIdAndDelete(precioEspecialId);
+    const specialPriceCheck = await SpecialPrice.findByIdAndDelete(precioEspecialId)
+    console.log("🟢 Resultado de findById antes de eliminar:", specialPriceCheck);
 
-    if (!specialPrice) {
-      throw new Error("Precio especial no encontrado.");
+    if (specialPriceCheck) {
+      console.log('el precio especial es', specialPriceCheck)
     }
-
+    
+    if (!specialPrice) {
+    
+      throw new Error("Precio especial no encontrado.");
+    } 
+    
 
     const usersCollection = mongoose.connection.collection("usuarios");
 
@@ -127,7 +135,7 @@ export const deletePrecioEspecial = async (userId: string, precioEspecialId: str
       { _id: new mongoose.Types.ObjectId(userId) },
       { 
         $pull: { 
-          preciosEspeciales: new mongoose.Types.ObjectId(precioEspecialId) 
+          preciosEspeciales: new mongoose.Types.ObjectId(specialPriceCheck) 
         } as unknown as mongoose.mongo.PullOperator<Types.ObjectId>
       }
     );

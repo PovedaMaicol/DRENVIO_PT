@@ -15,7 +15,7 @@ const NavBar  = () => {
       <Link to='/'>Articulos</Link>
       <br/>
       <Link to='/upload'>subir promoción</Link>
-+
+
      </div>
   )
 }

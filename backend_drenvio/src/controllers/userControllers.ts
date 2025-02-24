@@ -4,7 +4,16 @@ import Usuario from "../models/usuario";
 
 export const getUsers = async (_req: Request, res: Response): Promise<void> => {
     try {
-        const usuarios = await mongoose.connection.collection("usuarios").find({}).toArray(); 
+        const usuarios = await Usuario.aggregate([
+            {
+                $lookup: {
+                    from: "preciosEspecialesPoveda10", // Colección de precios especiales
+                    localField: "_id",  // ID del usuario en `usuarios`
+                    foreignField: "userId",  // ID del usuario en `preciosEspecialesPoveda10`
+                    as: "preciosEspeciales"  // Se guardan los precios especiales dentro del usuario
+                }
+            }
+        ])
         res.json(usuarios);
     } catch (error) {
         res.status(500).json({ message: "Server Error", error });

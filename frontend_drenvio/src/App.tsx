@@ -3,105 +3,116 @@ import NavBar from "./components/NavBar.tsx";
 import ProductsList from "./components/ProductsList";
 import Upload from "./components/Upload";
 import useFetch from "./hooks/useFetch";
-import { User } from "./types/user.ts";
 import SelectUser from "./components/SelectUser.tsx";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { User } from "./types/user.ts";
+import { SpecialPriceEntry } from "./types/specialPrice.ts";
+import { Product } from "./types/product.ts";
+
+
 
 function App() {
   const {
-    data: users,
+    data: users = [],
     loading: usersLoading,
     error: usersError,
+    refetch: refetchUsers,
   } = useFetch(import.meta.env.VITE_API_URL + "usuarios");
 
   const {
-    data: products,
+    data: products = [],
     loading: productsLoading,
     error: productsError,
   } = useFetch(import.meta.env.VITE_API_URL + "productos");
 
-  const [userLogin, setUserLogin] = useState<string>(""); // Ahora es un ID (string)
-  const [productsWithSpecialPrice, setProductsWithSpecialPrice] = useState<[]>([]); // Almacenar productos con precios especiales
+  const [userLogin, setUserLogin] = useState<string>(""); 
+  const [productsWithSpecialPrice, setProductsWithSpecialPrice] = useState<SpecialPriceEntry[]>([]); 
+  const [userId, setUserId] = useState("");
 
-  // Efecto para actualizar los productos con precios especiales cuando cambia el usuario logueado
+  // Filtrar solo usuarios con `role`
+  const filteredUsers = useMemo(() => {
+    return users.filter((user: User) => user.role);
+  }, [users]);
+
+  // Cuando el usuario cambia, actualizamos los precios especiales
   useEffect(() => {
-    if (userLogin && users && products) {
-      // Buscar el usuario completo por su ID
-      const loggedInUser = users.find((user) => user._id === userLogin);
-      console.log('el usuario logueado es', loggedInUser)
+    const loggedInUser = users.find((user: User) => user._id === userLogin) as User | undefined;
 
-      // si ahi un usuario, busque si tiene productos favoritos
-      if (loggedInUser.preciosEspeciales) {
-        console.log('tiene precios especiales', loggedInUser.preciosEspeciales)
-      }
-
-      if (loggedInUser) {
-        const updatedProducts = products.map((product) => {
-          // Verificar si el usuario tiene un arreglo specialPrice
-          if (loggedInUser.specialPrice && Array.isArray(loggedInUser.specialPrice)) {
-            console.log('tiene un arreglo de precios especiales', loggedInUser.specialPrice)
-            // Buscar si hay un precio especial para este producto
-            const specialPriceEntry = loggedInUser.specialPrice.find(
-              (entry) => entry.productId === product._id
-            );
-
-            // Si existe un precio especial, actualizar el precio del producto
-            if (specialPriceEntry) {
-              return {
-                ...product,
-                price: specialPriceEntry.specialPrice, // Usar el precio especial
-              };
-            }
-          }
-
-          // Si no hay precio especial, devolver el producto con el precio por defecto
-          return product;
-        });
-
-        // Actualizar el estado con los productos modificados
-        setProductsWithSpecialPrice(updatedProducts);
-      } else {
-        // Si no se encuentra el usuario, usar los productos originales
-        setProductsWithSpecialPrice(products);
-      }
+    if (loggedInUser) {
+      setUserId(loggedInUser._id);
+      setProductsWithSpecialPrice(loggedInUser.preciosEspeciales || []);
+      console.log('el usuario en app es', userLogin)
     } else {
-      // Si no hay usuario logueado, usar los productos originales
-      setProductsWithSpecialPrice(products || []);
+      setProductsWithSpecialPrice([]);
     }
-  }, [userLogin, users, products]);
+  }, [userLogin, users]);
 
-  // Filtrar usuarios con role definido
-  const filterUser: User[] = users ? users.filter((user: User) => user.role) : [];
+  // Este efecto se activa cuando `users` cambia
+  useEffect(() => {
+    if (!userLogin) return;
 
-  console.log("ID del usuario logueado:", userLogin);
+    
+    const updatedUser = users.find((user: User) => user._id === userLogin) as User | undefined;
+    if (updatedUser) {
+      setProductsWithSpecialPrice(updatedUser.preciosEspeciales );
+    } else {
+      setProductsWithSpecialPrice([]);
+    }
+  }, [users, userLogin]); //  Se ejecuta cada vez que `users` o `userLogin` cambia
 
+  // Mapeo de productos con los precios especiales
+  const newProducts: Product[] = useMemo(() => {
+    return products.map((product: Product) => {
+      const specialPriceEntry = productsWithSpecialPrice.find((p: SpecialPriceEntry) => p.productId === product._id);
+      return specialPriceEntry
+        ? { ...product, specialPrice: specialPriceEntry.specialPrice, specialProductId: specialPriceEntry._id }
+        : product;
+    });
+  }, [products, productsWithSpecialPrice]); 
+
+  // Función que recarga usuarios y activa `useEffect`
+  const handleSpecialPriceUpdated = async (): Promise<void> => {
+    await refetchUsers();
+  
+    const updatedUser = users.find((user: User) => user._id === userLogin) as User | undefined;
+    if (updatedUser) {
+      setProductsWithSpecialPrice(updatedUser.preciosEspeciales || []);
+    } else {
+      setProductsWithSpecialPrice([]);
+    }
+  };
+  
 
   return (
     <>
       <NavBar />
       <SelectUser
-        usersFilter={filterUser}
+        usersFilter={filteredUsers} 
         usersLoading={usersLoading}
         usersError={usersError}
         userLogin={userLogin}
         setUserLogin={setUserLogin}
       />
       <Routes>
-        <Route
-          path="/"
-          element={<ProductsList products={productsWithSpecialPrice} />} // Pasar productos con precios especiales
+        <Route 
+          path="/" 
+          element={<ProductsList 
+            products={newProducts} 
+            userId={userId} 
+            onSpecialPriceUpdated={handleSpecialPriceUpdated} 
+          />} 
         />
         <Route
           path="/upload"
           element={
             <Upload
-              products={productsWithSpecialPrice} // Pasar productos con precios especiales
+              products={newProducts}
               productsLoading={productsLoading}
               productsError={productsError}
-              usersFilter={filterUser}
+              usersFilter={filteredUsers}
               usersLoading={usersLoading}
               usersError={usersError}
-              userLogin={userLogin} // Pasar el ID del usuario logueado
+              onSpecialPriceUpdated={handleSpecialPriceUpdated} // actualiza los productos al agregar precio especial
             />
           }
         />

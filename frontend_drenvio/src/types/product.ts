@@ -9,6 +9,8 @@ export interface Product {
     stock: number;
     tags: string[];
     updatedAt: string;
+    specialPrice?: number;
+    specialProductId?: string;
   }
 
   export type Result<T> = T[];

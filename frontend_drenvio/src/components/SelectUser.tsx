@@ -6,7 +6,7 @@ usersFilter: Result<User>,
 usersLoading: boolean,
 usersError: string | null
 userLogin: string,
-setUserLogin: string
+setUserLogin: (value: string) => void
 }
 const SelectUser: React.FC<SelectUserProps> = ({ usersFilter, usersError, usersLoading, userLogin, setUserLogin}) => {
 

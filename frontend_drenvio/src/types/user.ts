@@ -4,6 +4,6 @@ export interface User {
     nombre: string;
     password: string;
     preciosEspeciales: [];
-    role: string;
+    role: 'admin' | 'user';
     __v: number;
 }
