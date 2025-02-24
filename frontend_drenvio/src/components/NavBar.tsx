@@ -1,23 +1,21 @@
+import { Link } from "react-router-dom";
+import { Navbar, Nav, Container } from "react-bootstrap";
 
-import { Link } from "react-router-dom"
-
-
-
-
-
-const NavBar  = () => {
-  
-
-
+const NavBar = () => {
   return (
-    <div>
-     
-      <Link to='/'>Articulos</Link>
-      <br/>
-      <Link to='/upload'>subir promoción</Link>
+    <Navbar bg="dark" variant="dark" expand="lg">
+      <Container>
+        <Navbar.Brand as={Link} to="/">DRENVIO</Navbar.Brand>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav className="ms-auto">
+            <Nav.Link as={Link} to="/">Artículos</Nav.Link>
+            <Nav.Link as={Link} to="/upload">Subir Promoción</Nav.Link>
+          </Nav>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
+  );
+};
 
-     </div>
-  )
-}
-
-export default NavBar
+export default NavBar;

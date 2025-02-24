@@ -91,10 +91,12 @@ export const addPrecioEspecial = async (precioEspecial: SpecialPriceEntry) => {
       }  
     );
 
+   // ¿como quiero poblar cada campo, defini la información?
     const populatedSprecialPrice = await SpecialPrice.findById(addedSpecialPrice._id)
     .populate("userId", "nombre role")
     .populate("productId", "name price")
     .exec()
+    
 
     if(!populatedSprecialPrice) {
       throw new Error("No se pudo obtener el precio especial con los detalles poblados.");
@@ -113,20 +115,17 @@ export const addPrecioEspecial = async (precioEspecial: SpecialPriceEntry) => {
 
 export const deletePrecioEspecial = async (userId: string, precioEspecialId: string) => {
   try {
-console.log('el backend recibe el precioId', precioEspecialId)
-console.log('el backend recibe el usuario,', userId)
+// console.log('el backend recibe el precioId', precioEspecialId)
+// console.log('el backend recibe el usuario,', userId)
 
-    const specialPriceCheck = await SpecialPrice.findByIdAndDelete(precioEspecialId)
-    console.log("🟢 Resultado de findById antes de eliminar:", specialPriceCheck);
+    const specialPriceCheck = await SpecialPrice.findByIdAndDelete(precioEspecialId);
+    // console.log(" Resultado de findById antes de eliminar:", specialPriceCheck);
 
-    if (specialPriceCheck) {
-      console.log('el precio especial es', specialPriceCheck)
-    }
-    
-    if (!specialPrice) {
-    
+    if (!specialPriceCheck) {
       throw new Error("Precio especial no encontrado.");
-    } 
+    }
+
+    // console.log('el precio especial es', specialPriceCheck);
     
 
     const usersCollection = mongoose.connection.collection("usuarios");

@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import NavBar from "./components/NavBar.tsx";
 import ProductsList from "./components/ProductsList";
 import Upload from "./components/Upload";
@@ -9,9 +9,9 @@ import { User } from "./types/user.ts";
 import { SpecialPriceEntry } from "./types/specialPrice.ts";
 import { Product } from "./types/product.ts";
 
-
-
 function App() {
+  const location = useLocation(); // Obtener la ruta actual
+
   const {
     data: users = [],
     loading: usersLoading,
@@ -34,31 +34,27 @@ function App() {
     return users.filter((user: User) => user.role);
   }, [users]);
 
-  // Cuando el usuario cambia, actualizamos los precios especiales
   useEffect(() => {
     const loggedInUser = users.find((user: User) => user._id === userLogin) as User | undefined;
 
     if (loggedInUser) {
       setUserId(loggedInUser._id);
       setProductsWithSpecialPrice(loggedInUser.preciosEspeciales || []);
-      console.log('el usuario en app es', userLogin)
     } else {
       setProductsWithSpecialPrice([]);
     }
   }, [userLogin, users]);
 
-  // Este efecto se activa cuando `users` cambia
   useEffect(() => {
     if (!userLogin) return;
-
     
     const updatedUser = users.find((user: User) => user._id === userLogin) as User | undefined;
     if (updatedUser) {
-      setProductsWithSpecialPrice(updatedUser.preciosEspeciales );
+      setProductsWithSpecialPrice(updatedUser.preciosEspeciales || []);
     } else {
       setProductsWithSpecialPrice([]);
     }
-  }, [users, userLogin]); //  Se ejecuta cada vez que `users` o `userLogin` cambia
+  }, [users, userLogin]);
 
   // Mapeo de productos con los precios especiales
   const newProducts: Product[] = useMemo(() => {
@@ -68,12 +64,10 @@ function App() {
         ? { ...product, specialPrice: specialPriceEntry.specialPrice, specialProductId: specialPriceEntry._id }
         : product;
     });
-  }, [products, productsWithSpecialPrice]); 
+  }, [products, productsWithSpecialPrice]);
 
-  // Función que recarga usuarios y activa `useEffect`
   const handleSpecialPriceUpdated = async (): Promise<void> => {
     await refetchUsers();
-  
     const updatedUser = users.find((user: User) => user._id === userLogin) as User | undefined;
     if (updatedUser) {
       setProductsWithSpecialPrice(updatedUser.preciosEspeciales || []);
@@ -81,18 +75,23 @@ function App() {
       setProductsWithSpecialPrice([]);
     }
   };
-  
 
   return (
-    <>
+    <div>
       <NavBar />
-      <SelectUser
-        usersFilter={filteredUsers} 
-        usersLoading={usersLoading}
-        usersError={usersError}
-        userLogin={userLogin}
-        setUserLogin={setUserLogin}
-      />
+      <br />
+      
+      {/* Mostrar SelectUser solo si NO estamos en "/upload" */}
+      {location.pathname !== "/upload" && (
+        <SelectUser
+          usersFilter={filteredUsers} 
+          usersLoading={usersLoading}
+          usersError={usersError}
+          userLogin={userLogin}
+          setUserLogin={setUserLogin}
+        />
+      )}
+
       <Routes>
         <Route 
           path="/" 
@@ -112,12 +111,12 @@ function App() {
               usersFilter={filteredUsers}
               usersLoading={usersLoading}
               usersError={usersError}
-              onSpecialPriceUpdated={handleSpecialPriceUpdated} // actualiza los productos al agregar precio especial
+              onSpecialPriceUpdated={handleSpecialPriceUpdated}
             />
           }
         />
       </Routes>
-    </>
+    </div>
   );
 }
 

@@ -29,7 +29,7 @@ export const getUserId = async (id: string) => {
             { $match: { _id: new mongoose.Types.ObjectId(id) } }, // Buscar usuario por ID
             {
                 $lookup: {
-                    from: "preciosEspecialesPoveda10", // Nombre de la colección en MongoDB (importante: debe estar en minúsculas)
+                    from: "preciosEspecialesPoveda10", // Nombre de la colección en MongoDB 
                     localField: "_id",  // ID del usuario en la colección `usuarios`
                     foreignField: "userId",  // ID del usuario en `preciosEspecialesPoveda10`
                     as: "preciosEspeciales"  // Nombre del campo donde se guardará el resultado
